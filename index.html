@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Romina Stella — Photography</title>
+<style>
+  :root { --bg:#fff; --fg:#111; --muted:#8a8a8a; --gap:clamp(56px,9vw,130px); }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0e0e0e; --fg:#eee; --muted:#777; } }
+  * { box-sizing:border-box; margin:0; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--fg); font:400 14px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif; letter-spacing:.02em; }
+  a { color:inherit; text-decoration:none; }
+  header { position:fixed; inset:0 0 auto 0; z-index:10; display:flex; justify-content:space-between; align-items:center;
+           padding:22px clamp(20px,4vw,48px); background:linear-gradient(var(--bg) 40%,transparent); }
+  .logo { font-size:15px; letter-spacing:.18em; text-transform:uppercase; }
+  nav { display:flex; gap:clamp(14px,2.5vw,32px); }
+  nav a { color:var(--muted); transition:color .2s; }
+  nav a:hover, nav a.on { color:var(--fg); }
+  main { padding:140px clamp(16px,4vw,48px) 0; }
+  .photo { max-width:1200px; margin:0 auto var(--gap); }
+  .photo img { display:block; width:100%; height:auto; opacity:0; transition:opacity .9s; }
+  .photo img.loaded { opacity:1; }
+  .photo figcaption { margin-top:12px; display:flex; justify-content:space-between; color:var(--muted); font-size:12px; }
+  .photo.hide { display:none; }
+  section { max-width:560px; margin:0 auto var(--gap); }
+  h2 { font-weight:400; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:0 20px 48px; }
+  @media (max-width:560px){ header{flex-direction:column;align-items:flex-start;gap:8px} nav{flex-wrap:wrap} main{padding-top:120px} }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#top">Romina Stella</a>
+  <nav id="nav"></nav>
+</header>
+
+<main id="top">
+  <div id="gallery"></div>
+  <section id="about">
+    <h2>About</h2>
+    <p>Photographer. Add a few sentences here: where you're based, what you shoot, and what draws you to it.</p>
+  </section>
+  <section id="contact">
+    <h2>Contact</h2>
+    <p><a href="mailto:info@rominastella.com">info@rominastella.com</a><br>
+       <a href="https://instagram.com/rominastellaphoto">@rominastellaphoto</a></p>
+  </section>
+</main>
+<footer>© <span id="y"></span> Romina Stella. All images are my own and may not be used without consent.</footer>
+
+<script>
+  // To add a photo: drop the file in /images and add a line here. Order = scroll order.
+  // cat: people | urban | nature
+  const photos = [
+    { file:"images/lorikeet-love.jpg",  title:"Lorikeet Love",  cat:"nature" },
+    { file:"images/neon-boneyard.jpg",  title:"Neon Boneyard",  cat:"urban"  },
+    { file:"images/garden-bridge.jpg",  title:"Garden Bridge",  cat:"nature" },
+    { file:"images/edinburgh.jpg",      title:"Edinburgh",      cat:"urban"  },
+    { file:"images/passion-flower.jpg", title:"Passion Flower", cat:"nature" },
+    { file:"images/solar-eclipse.jpg",  title:"Solar Eclipse",  cat:"nature" },
+    { file:"images/butterfly.jpg",      title:"Butterfly",      cat:"nature" },
+  ];
+
+  const g = document.getElementById("gallery");
+  photos.forEach(p => {
+    const f = document.createElement("figure");
+    f.className = "photo"; f.dataset.cat = p.cat;
+    f.innerHTML = `<img src="${p.file}" alt="${p.title}" loading="lazy"><figcaption><span>${p.title}</span><span>${p.cat}</span></figcaption>`;
+    const img = f.querySelector("img");
+    img.addEventListener("load", () => img.classList.add("loaded"));
+    if (img.complete) img.classList.add("loaded");
+    g.append(f);
+  });
+
+  // Nav shows only categories that have photos.
+  const cats = ["people","urban","nature"].filter(c => photos.some(p => p.cat === c));
+  const nav = document.getElementById("nav");
+  nav.innerHTML = ["all",...cats].map((c,i) => `<a href="#" data-f="${c}" class="${i?"":"on"}">${c[0].toUpperCase()+c.slice(1)}</a>`).join("")
+    + `<a href="#about">About</a><a href="#contact">Contact</a>`;
+  nav.querySelectorAll("a[data-f]").forEach(a => a.addEventListener("click", e => {
+    e.preventDefault();
+    nav.querySelectorAll("a").forEach(x => x.classList.remove("on"));
+    a.classList.add("on");
+    const f = a.dataset.f;
+    document.querySelectorAll(".photo").forEach(p => p.classList.toggle("hide", f !== "all" && p.dataset.cat !== f));
+    scrollTo({top:0});
+  }));
+  document.getElementById("y").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
